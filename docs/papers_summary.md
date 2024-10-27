@@ -4,13 +4,13 @@
 
 | Paper                             | Parallelism Scheme   | Overlap Scheme |
 | :-------------------------------- | -------------------- | -------------- |
-| Megatron-LM                       | Model Parallelism    |                |
+| [Megatron-LM](#megatron)          | Model Parallelism    |                |
 | Reducing Activation Recomputation |                      |                |
-| DeepSpeed Ulysses                 | Sequence Parallelism | No overlap     |
+| [DeepSpeed Ulysses](#deepspeed)   | Sequence Parallelism | No overlap     |
 | Centauri                          |                      |                |
 | Ring Attention                    |                      |                |
 
-## 1. Megatron-LM
+## 1. Megatron-LM<a name="megatron"></a>
 
 <img src="../figs/megtron-lm-design.png" alt="60" style="zoom:50%;" />
 
@@ -36,7 +36,7 @@ Shown below.
 
 
 
-## 3. DeepSpeed Ulysses
+## 3. DeepSpeed Ulysses<a name="deepspeed"></a>
 
 ![DeepSpeed Ulysses Design](../figs/deepspeed-ulysses-design.png)
 
