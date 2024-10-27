@@ -2,13 +2,13 @@
 
 - Key points summarized for papers centered around distributed training
 
-| Paper                             | Parallelism Scheme       | Overlap Scheme |
-| :-------------------------------- | ------------------------ | -------------- |
-| [Megatron-LM](#megatron)          | Model/Tensor Parallelism | No overlap     |
-| Reducing Activation Recomputation |                          |                |
-| [DeepSpeed Ulysses](#deepspeed)   | Sequence Parallelism     | No overlap     |
-| Centauri                          |                          |                |
-| Ring Attention                    |                          |                |
+| Paper                                        | Parallelism Scheme                          | Overlap Scheme |
+| :------------------------------------------- | ------------------------------------------- | -------------- |
+| [Megatron-LM](#megatron)                     | Tensor Parallelism                          | No overlap     |
+| [Reducing Activation Recomputation](#reduce) | Sequence Parallelism + Activation Recompute | No overlap     |
+| [DeepSpeed Ulysses](#deepspeed)              | Sequence Parallelism                        | No overlap     |
+| Centauri                                     |                                             |                |
+| Ring Attention                               |                                             |                |
 
 ## 1. Megatron-LM<a name="megatron"></a>
 
@@ -32,7 +32,9 @@ Shown below.
 
 
 
-## 2. Reducing Activation Recomputation
+## 2. Reducing Activation Recomputation<a name="reduce"></a>
+
+Sequence Parallelism + Avtication Recomputation, with Tensor Parallelism
 
 
 
