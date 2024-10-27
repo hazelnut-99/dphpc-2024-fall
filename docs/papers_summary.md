@@ -4,13 +4,39 @@
 
 | Paper                             | Parallelism Scheme   | Overlap Scheme |
 | :-------------------------------- | -------------------- | -------------- |
-| Megatron-LM                       |                      |                |
+| Megatron-LM                       | Model Parallelism    |                |
 | Reducing Activation Recomputation |                      |                |
 | DeepSpeed Ulysses                 | Sequence Parallelism | No overlap     |
 | Centauri                          |                      |                |
 | Ring Attention                    |                      |                |
 
-## DeepSpeed Ulysses
+## 1. Megatron-LM
+
+<img src="../figs/megtron-lm-design.png" alt="60" style="zoom:50%;" />
+
+### Model Parallelism
+
+- MLP
+  1. In first GEMM, split weight marix $A$ along column and duplicate matrix $X$
+  2. In second GEMM, split weight matrix $B$ along row
+
+- Multi-head Attention
+  1. Split each head with associated $Q, K, V$ along column
+  2. Split weight matrix $B$ along row
+
+
+
+### Communication Analysis
+
+Shown below.
+
+
+
+## 2. Reducing Activation Recomputation
+
+
+
+## 3. DeepSpeed Ulysses
 
 ![DeepSpeed Ulysses Design](../figs/deepspeed-ulysses-design.png)
 
