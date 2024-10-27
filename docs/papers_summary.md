@@ -36,7 +36,13 @@ Shown below.
 
 Sequence Parallelism + Avtication Recomputation, with Tensor Parallelism
 
+### Workflow
 
+Tbd
+
+### Analysis
+
+Tbd
 
 ## 3. DeepSpeed Ulysses<a name="deepspeed"></a>
 
