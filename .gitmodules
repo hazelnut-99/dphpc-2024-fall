@@ -1,0 +1,3 @@
+[submodule "src/nanotron-sp"]
+	path = src/nanotron-sp
+	url = git@github.com:TerryXhx/nanotron-sp.git
