@@ -7,7 +7,7 @@ conda activate nanotron-sp
 
 echo 'alias env_init="conda activate nanotron-sp; module load cuda/11.8.0 gcc/10.2.0 ninja/1.10.2"' >> ~/.bashrc
 source ~/.bashrc
-init
+env_init
 
 pip install --upgrade pip
 conda install pytorch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0  pytorch-cuda=11.8 -c pytorch -c nvidia
