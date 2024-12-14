@@ -891,6 +891,14 @@ class LlamaModel(nn.Module):
         input_ids: Union[torch.Tensor, TensorPointer],  # [batch_size, seq_length]
         input_mask: Union[torch.Tensor, TensorPointer],  # [batch_size, seq_length]
     ):
+        if self.config.test_mode:
+            input_save_path = "./checkpoints/input.pt"
+            inputs = {
+                "input_ids": input_ids, 
+                "input_mask": input_mask
+            }
+            torch.save(inputs, input_save_path)
+
         # all tensors are optional as most ranks don't need anything from the dataloader.
 
         output = self.token_position_embeddings(input_ids=input_ids, input_mask=input_mask)
@@ -901,6 +909,14 @@ class LlamaModel(nn.Module):
         }
         for encoder_block in self.decoder:
             hidden_encoder_states = encoder_block(**hidden_encoder_states)
+
+        if self.config.test_mode:
+            output_save_path = "./checkpoints/vanilla_output.pt"
+            output_hidden_states = {
+                "hidden_states": hidden_encoder_states["hidden_states"],
+                "sequence_mask": hidden_encoder_states["sequence_mask"],
+            }
+            torch.save(output_hidden_states, output_save_path)
 
         hidden_states = self.final_layer_norm(input=hidden_encoder_states["hidden_states"])["hidden_states"]
 

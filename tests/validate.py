@@ -1,68 +1,50 @@
 """
-Validate if two Nanotron models are equal.
+Validate if two Nanotron model attention outputs are equal.
 Command:
     torchrun --nproc_per_node=1 validate.py --checkpoint_path_1=nanotron-1-path --checkpoint_path_2=nanotron-2-path
 """
 
-import json
 from argparse import ArgumentParser
-from pathlib import Path
-
-import torch
-from convert_weights import load_nanotron_model
-from nanotron.config import LlamaConfig as NanotronLlamaConfig
-from nanotron.models.llama import LlamaForTraining
-
 from log import *
+import torch
+from nanotron.parallel.sequence_parallel.ring_flash_attn.utils import zigzag_split
 
+log_level = 0
 
-def load_model(
-    checkpoint_path: Path
-) -> LlamaForTraining:
-    """Load a Nanotron model from a checkpoint."""
-    with open(checkpoint_path / "model_config.json", "r") as f:
-        attrs = json.load(f)
-        model_config = NanotronLlamaConfig(**attrs)
-    nanotron_model = load_nanotron_model(
-        model_config=model_config,
-        checkpoint_path=checkpoint_path,
-    )
-
-    return nanotron_model
-
-
-def compare_models(
-    nanotron_model_1: LlamaForTraining, 
-    nanotron_model_2: LlamaForTraining, 
-    tolerance: float = 1e-5
-) -> bool:
-    """Compares two nanotron models to check if they are equal within a certain tolerance."""
-    nanotron_model_1_state_dict = nanotron_model_1.state_dict()
-    nanotron_model_2_state_dict = nanotron_model_2.state_dict()
-    for key in nanotron_model_1_state_dict.keys():
-        if key in nanotron_model_2_state_dict:
-            diff = torch.abs(nanotron_model_1_state_dict[key] - nanotron_model_2_state_dict[key])
-            if torch.any(diff > tolerance):
-                log_error(f"Model weights differ for key {key}.")
-                log_error(f"Max difference: {torch.max(diff)}")
-                return False
-        else:
-            log_error(f"Key {key} not found in model 2.")
-            return False
-        log_info(f"Model weights are equal for key {key}.")
-    log_success("Models are equal.")
+def compare_tensors(tensor1, tensor2, torlerance=1/128):
+    diff = torch.abs(tensor1 - tensor2)
+    if log_level == 1:
+        log_info(f'Min diff: {torch.min(diff)}')
+        log_info(f'Mean diff: {torch.mean(diff)}')
+        log_info(f'Max diff: {torch.max(diff)}')
+    if torch.any(diff > torlerance):
+        return False
     return True
 
-
 if __name__ == "__main__":
-    parser = ArgumentParser(description="Compare two Nanotron models to check if they are equal")
-    parser.add_argument("--checkpoint_1_path", type=Path, default="checkpoints/vanilla/100", help="Path to the first checkpoint")
-    parser.add_argument("--checkpoint_2_path", type=Path, default="checkpoints/sp/100", help="Path to the second checkpoint")
+    parser = ArgumentParser(description="Compare two Nanotron model attention outputs to check if they are equal")
+    parser.add_argument("--ranks", type=int, default=2, help="Rank of the process in SP model")
+    parser.add_argument("--log-level", type=str, default="SUCC", help="Logging level")
     args = parser.parse_args()
 
-    # Load Nanotron models.
-    nanotron_model_1 = load_model(args.checkpoint_1_path)
-    nanotron_model_2 = load_model(args.checkpoint_2_path)
+    if args.log_level == "INFO":
+        log_level = 1
 
-    # Compare models.
-    compare_models(nanotron_model_1, nanotron_model_2)
+    # Load the attention outputs of vanilla Nanotron model
+    vanilla_path = f"./checkpoints/vanilla_output.pt"
+    vanilla_output = torch.load(vanilla_path, map_location=torch.device("cuda"), weights_only=True)["hidden_states"]
+
+    # Load the attention outputs of Nanotron model with SP
+    for r in range(args.ranks):
+        sp_path = f"./checkpoints/sp_output_r{r}.pt"
+        sp_output = torch.load(sp_path, map_location=torch.device("cuda"), weights_only=True)["hidden_states"]
+        vaniall_local_output = zigzag_split(r, args.ranks, vanilla_output, dim=0)[0]
+        if log_level == 1:
+            log_info(f'Rank {r} SP output: {sp_output}')
+            log_info(f'Rank {r} SP output shape: {sp_output.shape}')
+            log_info(f'Rank {r} Vanilla local output: {vaniall_local_output}')
+            log_info(f'Rank {r} Vanilla local output shape: {vaniall_local_output.shape}')
+        if not compare_tensors(sp_output, vaniall_local_output):
+            log_error(f"Attention outputs of vanilla Nanotron and Nanotron with SP are not equal for rank {r}")
+    
+    log_success("All attention outputs are equal")

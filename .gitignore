@@ -166,3 +166,5 @@ cython_debug/
 
 checkpoints/
 wandb/
+
+log_*.txt
