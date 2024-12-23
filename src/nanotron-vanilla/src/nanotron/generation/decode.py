@@ -406,6 +406,12 @@ def decode_text(
                     global_batch_size=global_batch_size,
                 )
 
+                import os
+                import torch.cuda.nvtx as nvtx
+                pid = os.getpid()
+
+                nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - Decode:  global_batch_size {global_batch_size} tokens_per_sec {global_batch_size * max_new_tokens / total_time_sec} model_tflops {model_tflops} hardware_tflops {hardware_tflops}")
+
                 bench_config = BenchArgs(
                     model_name=model.config._name_or_path,
                     sequence_length=max_new_tokens,

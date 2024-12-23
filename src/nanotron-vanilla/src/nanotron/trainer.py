@@ -606,6 +606,12 @@ class DistributedTrainer:
             global_batch_size=self.global_batch_size,
         )
 
+        import os
+        import torch.cuda.nvtx as nvtx
+        pid = os.getpid()
+
+        nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - Train Step: global_batch_size {self.global_batch_size} tokens_per_sec {self.global_batch_size * self.sequence_length / (elapsed_time_per_iteration_ms / 1000)} model_tflops {model_tflops} hardware_tflops {hardware_tflops}")
+
         if dist.get_rank(self.parallel_context.world_pg) in self.logger_ranks:
             assert self.loggerwriter is not None, "loggerwriter should be defined on logger ranks"
 
@@ -658,6 +664,8 @@ class DistributedTrainer:
                         "iteration_step": self.iteration_step,
                     }
                 )
+
+            nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - iteration {self.iteration_step} / {self.loggerwriter.global_step}")    
 
             self.loggerwriter.add_scalars_from_list(log_entries, self.iteration_step)
 
