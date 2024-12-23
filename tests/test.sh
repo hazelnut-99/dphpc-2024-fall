@@ -32,4 +32,4 @@ CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=2 ../src/nanotron-vanill
 echo "[INFO] Modified Nanotron training done"
 
 # # Evaluate the models
-CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=1 validate.py --ranks 2
+CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=1 validate.py --ring_ranks 1 --ulysses_ranks 2
