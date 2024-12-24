@@ -406,11 +406,30 @@ def decode_text(
                     global_batch_size=global_batch_size,
                 )
 
+                # import os
+                # import torch.cuda.nvtx as nvtx
+                # pid = os.getpid()
+
+                # nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - Decode:  global_batch_size {global_batch_size} tokens_per_sec {global_batch_size * max_new_tokens / total_time_sec} model_tflops {model_tflops} hardware_tflops {hardware_tflops}")
+
                 import os
                 import torch.cuda.nvtx as nvtx
-                pid = os.getpid()
+                import json
 
-                nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - Decode:  global_batch_size {global_batch_size} tokens_per_sec {global_batch_size * max_new_tokens / total_time_sec} model_tflops {model_tflops} hardware_tflops {hardware_tflops}")
+                pid = os.getpid()
+                rank = dist.get_rank()
+                tokens_per_sec = global_batch_size * max_new_tokens / total_time_sec
+
+                nvtx_record = {
+                    "rank": rank,
+                    "PID": pid,
+                    "global_batch_size": global_batch_size,
+                    "tokens_per_sec": tokens_per_sec,
+                    "model_tflops": model_tflops,
+                    "hardware_tflops": hardware_tflops,
+                }
+
+                nvtx.mark(json.dumps(nvtx_record))
 
                 bench_config = BenchArgs(
                     model_name=model.config._name_or_path,

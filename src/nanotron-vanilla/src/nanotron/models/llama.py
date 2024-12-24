@@ -749,8 +749,48 @@ class LlamaDecoderLayer(nn.Module):
         if self.recompute_layer and not isinstance(hidden_states, TensorPointer):
             hidden_states, sequence_mask = self._checkpointed_forward(hidden_states, sequence_mask)
         else:
+            # import torch.distributed as dist
+            # import os
+            # from nanotron.logging import (
+            #     LoggerWriter,
+            #     LogItem,
+            #     human_format,
+            #     log_memory,
+            #     log_rank,
+            #     set_ranks_logging_level,
+            # )
+            # import torch.cuda.nvtx as nvtx
+
+            # pid = os.getpid()
+
+            # mem_info = (
+            #     f"Memory usage: {torch.cuda.memory_allocated() / 1024**2:.2f} MiB. "
+            #     f"Peak allocated: {torch.cuda.max_memory_allocated() / 1024**2:.2f} MiB. "
+            #     f"Peak reserved: {torch.cuda.max_memory_reserved() / 1024**2:.2f} MiB."
+            # )
+            # nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - Before _core_forward memory info: {mem_info}")
+
+            # nvtx.range_push(f"rank_{dist.get_rank()} PID_{pid} - _core_forward execution")
+            # ForwardStartEvent = torch.cuda.Event(True, True)
+            # ForwardEndEvent = torch.cuda.Event(True, True)
+            # ForwardStartEvent.record()
+            # hidden_states, sequence_mask = self._core_forward(hidden_states, sequence_mask)
+            # ForwardEndEvent.record()
+            # torch.cuda.synchronize()
+            # span = ForwardStartEvent.elapsed_time(ForwardEndEvent)
+            # nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - Time span of _core_forward: {span}")
+            # nvtx.range_pop()
+
+            # mem_info = (
+            #     f"Memory usage: {torch.cuda.memory_allocated() / 1024**2:.2f} MiB. "
+            #     f"Peak allocated: {torch.cuda.max_memory_allocated() / 1024**2:.2f} MiB. "
+            #     f"Peak reserved: {torch.cuda.max_memory_reserved() / 1024**2:.2f} MiB."
+            # )
+            # nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - After _core_forward memory info: {mem_info}")
+
             import torch.distributed as dist
             import os
+            import json
             from nanotron.logging import (
                 LoggerWriter,
                 LogItem,
@@ -762,33 +802,55 @@ class LlamaDecoderLayer(nn.Module):
             import torch.cuda.nvtx as nvtx
 
             pid = os.getpid()
+            rank = dist.get_rank()
 
-            # log_memory(logger=logger)
-            mem_info = (
-                f"Memory usage: {torch.cuda.memory_allocated() / 1024**2:.2f} MiB. "
-                f"Peak allocated: {torch.cuda.max_memory_allocated() / 1024**2:.2f} MiB. "
-                f"Peak reserved: {torch.cuda.max_memory_reserved() / 1024**2:.2f} MiB."
-            )
-            nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - Before _core_forward memory info: {mem_info}")
+            def get_memory_info():  ## log_memory(logger=logger)
+                return {
+                    "current_usage_mib": torch.cuda.memory_allocated() / 1024**2,
+                    "peak_allocated_mib": torch.cuda.max_memory_allocated() / 1024**2,
+                    "peak_reserved_mib": torch.cuda.max_memory_reserved() / 1024**2,
+                }
 
-            nvtx.range_push(f"rank_{dist.get_rank()} PID_{pid} - _core_forward execution")
-            ForwardStartEvent = torch.cuda.Event(True, True)
-            ForwardEndEvent = torch.cuda.Event(True, True)
+            mem_info = get_memory_info()
+            nvtx.mark(json.dumps({
+                "rank": rank,
+                "PID": pid,
+                "event": "before_core_forward",
+                "memory_info": mem_info
+            }))
+
+            nvtx.range_push(json.dumps({
+                "rank": rank,
+                "PID": pid,
+                "event": "_core_forward_execution"
+            }))
+
+            ForwardStartEvent = torch.cuda.Event(enable_timing=True)
+            ForwardEndEvent = torch.cuda.Event(enable_timing=True)
             ForwardStartEvent.record()
+
             hidden_states, sequence_mask = self._core_forward(hidden_states, sequence_mask)
+
             ForwardEndEvent.record()
             torch.cuda.synchronize()
+
             span = ForwardStartEvent.elapsed_time(ForwardEndEvent)
-            nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - Time span of _core_forward: {span}")
+            nvtx.mark(json.dumps({
+                "rank": rank,
+                "PID": pid,
+                "event": "_core_forward_time_span",
+                "time_elapsed_ms": span
+            }))
+
             nvtx.range_pop()
 
-            # log_memory(logger=logger)
-            mem_info = (
-                f"Memory usage: {torch.cuda.memory_allocated() / 1024**2:.2f} MiB. "
-                f"Peak allocated: {torch.cuda.max_memory_allocated() / 1024**2:.2f} MiB. "
-                f"Peak reserved: {torch.cuda.max_memory_reserved() / 1024**2:.2f} MiB."
-            )
-            nvtx.mark(f"rank_{dist.get_rank()} PID_{pid} - After _core_forward memory info: {mem_info}")
+            mem_info = get_memory_info()
+            nvtx.mark(json.dumps({
+                "rank": rank,
+                "PID": pid,
+                "event": "after_core_forward",
+                "memory_info": mem_info
+            }))
 
         return {
             "hidden_states": hidden_states,
