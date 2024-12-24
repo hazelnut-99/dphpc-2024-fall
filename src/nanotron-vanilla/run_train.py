@@ -234,4 +234,20 @@ if __name__ == "__main__":
     dataloader = get_dataloader(trainer)
 
     # Train
+    import torch.distributed as dist
+    import os
+    import json
+    import torch.cuda.nvtx as nvtx
+
+    pid = os.getpid()
+    rank = dist.get_rank()
+
+    nvtx.range_push(json.dumps({
+                "rank": rank,
+                "PID": pid,
+                "event": "Vanilla Nanotron training"
+            }))
+    
     trainer.train(dataloader)
+
+    nvtx.range_pop()
