@@ -17,6 +17,7 @@ shopt -s expand_aliases
 source ~/.bashrc
 env_init
 rm -rf checkpoints
+export HUGGINGFACE_TOKEN=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
 
 # Modified Nanotron training
 cd ../src/nanotron-sp
