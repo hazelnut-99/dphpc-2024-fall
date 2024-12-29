@@ -65,10 +65,10 @@ def execute_shell_command(cmd):
     return p.returncode
 
 
-def run_one_config(conf, conf_id):
+def run_one_config(conf, config_path):
     # create a directory using conf_id
     print("Training using config: " + ", ".join(f"{key}={value}" for key, value in conf.items()))
-    top_directory = f"output/{conf_id}"
+    top_directory = f"output/{config_path}"
     create_directory(top_directory)
     # generate the yaml file
     with open(f'{top_directory}/conf.yaml', 'w') as file:
@@ -88,15 +88,15 @@ def run_one_config(conf, conf_id):
 
 
 def run():
-    prefix = datetime.now().strftime("%Y%m%dT%H%M%S")
+    prefix = datetime.now().strftime("%Y%m%d%H%M%S")
     print(f"working directory prefix: {prefix}")
     index = 0
     for conf in train_configs:
         seq_len = 256
         while True:
             conf['sequence_length'] = seq_len
-            config_id = f"{prefix}_{index}"
-            success = run_one_config(conf, config_id)
+            config_path = f"{prefix}/{index}"
+            success = run_one_config(conf, config_path)
             seq_len <<= 2
             index += 1
             if not success or seq_len > 16384:
