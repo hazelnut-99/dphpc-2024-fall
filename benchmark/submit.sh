@@ -4,13 +4,13 @@
 gpus=$1
 top_directory=$2
 
-export NSYS_REPORT_DIR="./results/nsys_reports"
+export NSYS_REPORT_DIR="./${top_directory}/nsys_reports"
 rm -rf $NSYS_REPORT_DIR
 mkdir -p $NSYS_REPORT_DIR
 
 return_code=$?
 
-bash eval.sh ${gpus} "${top_directory}/conf.yaml"
+~/opt/nvidia/nsight-systems-cli/2024.5.1/bin/nsys profile --trace=nvtx,cuda  --cuda-memory-usage=false --cuda-um-cpu-page-faults=false --cuda-um-gpu-page-faults=false -s none --output=${NSYS_REPORT_DIR}/nanotron_llama_train_nsys_report_%h_%p bash eval.sh ${gpus} "${top_directory}/conf.yaml"
 
 for report_file in ${NSYS_REPORT_DIR}/*.nsys-rep; do
   if [ -f "$report_file" ]; then

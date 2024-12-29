@@ -3,11 +3,12 @@ import subprocess
 import os
 from datetime import datetime
 import json
+import time
+import shutil
 
 resource_conf = {
     "time": "04:00:00",
-    "partition": "amdrtx",
-    "nodelist": "ault[43]",
+    "nodelist": "ault[25]",
     "ntasks-per-node": 1,
     "mem": "200G",
     "account": "g34"
@@ -65,6 +66,8 @@ def render_yaml_content(conf):
 
 
 def create_directory(directory_path):
+    if os.path.exists(directory_path):
+        shutil.rmtree(directory_path)
     os.makedirs(directory_path, exist_ok=True)
 
 
@@ -79,6 +82,7 @@ def execute_shell_command(cmd):
 
 def run_one_config(conf, config_path):
     # create a directory using conf_id
+    time.sleep(5)
     print("Training using config: " + ", ".join(f"{key}={value}" for key, value in conf.items()))
     top_directory = f"output/{config_path}"
     create_directory(top_directory)
@@ -91,7 +95,7 @@ def run_one_config(conf, config_path):
     resource_conf['gpus-per-task'] = conf['gpus']
     srun_conf = " ".join([f"--{key}={value}" for key, value in resource_conf.items()])
     # submit job
-    command = f"srun {srun_conf} submit.sh {conf['gpus']} {top_directory}"
+    command = f"srun {srun_conf} bash submit.sh {conf['gpus']} {top_directory}"
     rc = execute_shell_command(command)
 
     # collect result dump to file
