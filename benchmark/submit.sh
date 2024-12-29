@@ -1,27 +1,18 @@
 #!/bin/bash -l
 
 # Take command-line parameters
-gpus=$1
-top_directory=$2
-
-if [ -z "$gpus" ] || [ -z "$top_directory" ]; then
-  echo "Usage: $0 <gpus> <top_directory>"
-  exit 1
-fi
-mkdir -p "$top_directory"
-
 #
 #SBATCH --job-name="nanotron_train"
 #SBATCH --time=04:00:00
 #SBATCH --partition=amdrtx
 #SBATCH --nodelist=ault[43]
 #SBATCH --ntasks-per-node=1
-#SBATCH --gpus-per-task=$gpus
 #SBATCH --mem=200G
-#SBATCH --output=${top_directory}/%j.o
-#SBATCH --error=${top_directory}/%j.o
 #SBATCH --account=g34
 
+
+gpus=$1
+top_directory=$2
 
 export NSYS_REPORT_DIR="$top_directory/nsys_reports"
 rm -rf $NSYS_REPORT_DIR
