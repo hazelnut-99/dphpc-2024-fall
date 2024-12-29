@@ -83,7 +83,7 @@ parallelism:
   tp: 1
   tp_linear_async_communication: true
   tp_mode: REDUCE_SCATTER
-  sp_ring: 1
+  sp_ring: 2
   sp_ulysses: 2
 profiler: null
 tokenizer:

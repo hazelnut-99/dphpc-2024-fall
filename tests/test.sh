@@ -28,8 +28,8 @@ echo "[INFO] Vanilla Nanotron training done"
 cd ../src/nanotron-sp
 pip install -e . > /dev/null 2>&1
 cd - > /dev/null 2>&1
-CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=2 ../src/nanotron-vanilla/run_train.py --config-file config_tiny_llama_resume_sp.yaml &> log_sp.txt
+CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=4 ../src/nanotron-vanilla/run_train.py --config-file config_tiny_llama_resume_sp.yaml &> log_sp.txt
 echo "[INFO] Modified Nanotron training done"
 
 # # Evaluate the models
-CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=1 validate.py --ring_ranks 1 --ulysses_ranks 2
+CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=1 validate.py --ring_ranks 2 --ulysses_ranks 2
