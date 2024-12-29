@@ -4,6 +4,16 @@ import os
 from datetime import datetime
 import json
 
+resource_conf = {
+    "time": "04:00:00",
+    "partition": "amdrtx",
+    "nodelist": "ault[43]",
+    "ntasks-per-node": 1,
+    "mem": "200G",
+    "account": "g34"
+}
+
+
 train_configs = [
     {'gpus': 1, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
     {'gpus': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
@@ -61,7 +71,9 @@ def create_directory(directory_path):
 def execute_shell_command(cmd):
     print(f"executing command: {cmd}")
     p = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    p.communicate()
+    (resultData, resultErr) = p.communicate()
+    print(resultData)
+    print(resultErr)
     return p.returncode
 
 
@@ -74,8 +86,12 @@ def run_one_config(conf, config_path):
     with open(f'{top_directory}/conf.yaml', 'w') as file:
         yaml.dump(render_yaml_content(conf), file)
 
+    resource_conf['output'] = f"{top_directory}/job_%j.o"
+    resource_conf['error'] = f"{top_directory}/job_%j.e"
+    resource_conf['gpus-per-task'] = conf['gpus']
+    srun_conf = " ".join([f"--{key}={value}" for key, value in resource_conf.items()])
     # submit job
-    command = f"sbatch submit.sh --output={top_directory}/output.o --error={top_directory}/error.e --gpus-per-task={conf['gpus']} {conf['gpus']} {top_directory}"
+    command = f"srun {srun_conf} submit.sh {conf['gpus']} {top_directory}"
     rc = execute_shell_command(command)
 
     # collect result dump to file
