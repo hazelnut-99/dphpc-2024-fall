@@ -68,20 +68,21 @@ def execute_shell_command(cmd):
 def run_one_config(conf, conf_id):
     # create a directory using conf_id
     print("Training using config: " + ", ".join(f"{key}={value}" for key, value in conf.items()))
-    create_directory(conf_id)
+    top_directory = f"output/{conf_id}"
+    create_directory(top_directory)
     # generate the yaml file
-    with open(f'{conf_id}/conf.yaml', 'w') as file:
+    with open(f'{top_directory}/conf.yaml', 'w') as file:
         yaml.dump(render_yaml_content(conf), file)
 
     # submit job
-    command = f"sbatch submit.sh {conf['gpus']} {conf_id}"
+    command = f"sbatch submit.sh {conf['gpus']} {top_directory}"
     rc = execute_shell_command(command)
 
     # collect result dump to file
     outcome = dict(conf)
     outcome['result'] = 'success' if rc == 0 else 'fail'
 
-    with open(f'{conf_id}/outcome.json', 'w') as json_file:
+    with open(f'{top_directory}/outcome.json', 'w') as json_file:
         json.dump(outcome, json_file, indent=4)
     return rc == 0
 
@@ -91,14 +92,14 @@ def run():
     print(f"working directory prefix: {prefix}")
     index = 0
     for conf in train_configs:
-        config_id = f"{prefix}_{index}"
         seq_len = 256
         while True:
             conf['sequence_length'] = seq_len
+            config_id = f"{prefix}_{index}"
             success = run_one_config(conf, config_id)
             seq_len <<= 2
             index += 1
-            if not success:
+            if not success or seq_len > 16384:
                 break
 
 

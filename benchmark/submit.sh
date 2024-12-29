@@ -14,26 +14,25 @@
 
 # Take command-line parameters
 gpus=$1
-config_id=$2
+top_directory=$2
 
-if [ -z "$gpus" ] || [ -z "$config_id" ]; then
-  echo "Usage: $0 <gpus> <config_id>"
+if [ -z "$gpus" ] || [ -z "$top_directory" ]; then
+  echo "Usage: $0 <gpus> <top_directory>"
   exit 1
 fi
 
 #SBATCH --gpus-per-task=$gpus
-config_dir="./$config_id"
-mkdir -p "$config_dir"
-#SBATCH --output=${config_dir}/%j.o
-#SBATCH --error=${config_dir}/%j.o
+mkdir -p "$top_directory"
+#SBATCH --output=${top_directory}/%j.o
+#SBATCH --error=${top_directory}/%j.o
 
-export NSYS_REPORT_DIR="$config_dir/nsys_reports"
+export NSYS_REPORT_DIR="$top_directory/nsys_reports"
 rm -rf $NSYS_REPORT_DIR
 mkdir -p $NSYS_REPORT_DIR
 
-srun bash eval.sh ${gpus} "${config_dir}/conf.yaml"
+srun bash eval.sh ${gpus} "${top_directory}/conf.yaml"
 
-# srun ~/opt/nvidia/nsight-systems-cli/2024.5.1/bin/nsys profile --trace=nvtx,cuda  --cuda-memory-usage=false --cuda-um-cpu-page-faults=false --cuda-um-gpu-page-faults=false -s none --output=${NSYS_REPORT_DIR}/nanotron_llama_train_nsys_report_%h_%p bash eval.sh ${gpus} "${config_dir}/conf.yaml"
+# srun ~/opt/nvidia/nsight-systems-cli/2024.5.1/bin/nsys profile --trace=nvtx,cuda  --cuda-memory-usage=false --cuda-um-cpu-page-faults=false --cuda-um-gpu-page-faults=false -s none --output=${NSYS_REPORT_DIR}/nanotron_llama_train_nsys_report_%h_%p bash eval.sh ${gpus} "${top_directory}/conf.yaml"
 
 return_code=$?
 
