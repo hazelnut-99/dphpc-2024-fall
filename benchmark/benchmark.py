@@ -74,7 +74,7 @@ def run_one_config(conf, conf_id):
         yaml.dump(render_yaml_content(conf), file)
 
     # submit job
-    command = f"SBATCH submit.sh {conf['gpus']} {conf_id}"
+    command = f"sbatch submit.sh {conf['gpus']} {conf_id}"
     rc = execute_shell_command(command)
 
     # collect result dump to file
