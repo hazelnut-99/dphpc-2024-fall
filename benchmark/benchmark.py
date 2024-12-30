@@ -82,8 +82,7 @@ def execute_shell_command(cmd):
 
 
 def prepare_one_config(conf, config_path):
-    time.sleep(5)
-    print("Training using config: " + ", ".join(f"{key}={value}" for key, value in conf.items()))
+    print("Generating config: " + ", ".join(f"{key}={value}" for key, value in conf.items()))
     top_directory = f"output/{config_path}"
     create_directory(top_directory)
 
