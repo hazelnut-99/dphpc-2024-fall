@@ -1877,42 +1877,14 @@ def main():
     # Get nsys events
     Dir_Path = './results/nsys_reports'
     Comm_Init_Events, NCCL_Events, CUPTI_Kernel_Results, Comm_Info, HostName_To_GoalRank = get_nsys_events(Dir_Path)  ## nccl_events, cupti_kernel_results, comm_info, HostName_To_GoalRank
-    with open("./results/nsys_events_intermediate_output.json", "w") as json_file:
-        json.dump(HostName_To_GoalRank, json_file, indent=4)
-        json_file.write('\n\n')
-        json.dump(Comm_Info, json_file, indent=4)
-        json_file.write('\n\n')
-        json.dump(CUPTI_Kernel_Results, json_file, indent=4)
-        json_file.write('\n\n')
-        json.dump(NCCL_Events, json_file, indent=4)
-        json_file.write('\n\n')
-        json.dump(Comm_Init_Events, json_file, indent=4)
-    print("Nsys_Events has been exported to nsys_events_intermediate_output.json")
 
     Merged_Events = merge_nsys_events(NCCL_Events, CUPTI_Kernel_Results, Comm_Info)
-    with open("./results/nsys_events_merged_output.json", "w") as json_file:
-        json.dump(Merged_Events, json_file, indent=4)
-        json_file.write('\n\n')
-    print("Merged_Events has been exported to nsys_events_merged_output.json")
-
-    Events_Pair = check_events_pair(Merged_Events)
-    with open("./results/nsys_events_pair_output.json", "w") as json_file:
-        json.dump(Events_Pair, json_file, indent=4)
-        json_file.write('\n\n')
 
     Events_Parallel_Group = get_events_parallel_group(Merged_Events)
-    with open("./results/nsys_events_parallel_group_output.json", "w") as json_file:
-        json.dump(Events_Parallel_Group, json_file, indent=4)
-        json_file.write('\n\n')
-
-    Goal_File_Name = "./results/Events_Dependency.goal"
-    get_events_dependency(Events_Parallel_Group, Comm_Init_Events, Goal_File_Name)
 
     Goal_File_Name = "./results/InGPU_MicroEvents_Dependency.goal"
     SendRecvEvents_To_TaskCounter, Comm_Vol = get_in_gpu_microevents_dependency(Events_Parallel_Group, Comm_Init_Events, Comm_Info, Goal_File_Name)
-    with open("./results/SendRecvEvents_To_TaskCounter.json", "w") as json_file:
-        json.dump(SendRecvEvents_To_TaskCounter, json_file, indent=4)
-        json_file.write('\n\n')
+
     with open("./results/Communication_Volume.json", "w") as json_file:
         json.dump(Comm_Vol, json_file, indent=4)
         json_file.write('\n\n')
