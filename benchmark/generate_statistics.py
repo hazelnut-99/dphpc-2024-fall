@@ -104,7 +104,7 @@ def run(top_dir):
                 full_path = os.path.join(subdir_path, file_name)
                 if file_name.endswith(".sqlite"):
                     sqlite_path = full_path
-                elif file_name.endswith(".json"):
+                elif file_name.endswith("parameters.json"):
                     json_path = full_path
                 elif file_name.endswith("return_code"):
                     result_path = full_path

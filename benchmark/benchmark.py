@@ -9,38 +9,38 @@ import uuid
 
 train_configs = [
     {'gpus': 1, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 4},
-    {'gpus': 4, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 4, 'num_attention_heads': 4},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 4},
-    {'gpus': 1, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 4},
-    {'gpus': 4, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 4, 'num_attention_heads': 4},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 4},
-
-    {'gpus': 1, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
-    {'gpus': 4, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 4, 'num_attention_heads': 2},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 2},
-    {'gpus': 1, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
-    {'gpus': 4, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
-    {'gpus': 4, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    # {'gpus': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    # {'gpus': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    # {'gpus': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 4},
+    # {'gpus': 4, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 4, 'num_attention_heads': 4},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 4},
+    # {'gpus': 1, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    # {'gpus': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    # {'gpus': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    # {'gpus': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 4},
+    # {'gpus': 4, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 4, 'num_attention_heads': 4},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 4},
+    #
+    # {'gpus': 1, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    # {'gpus': 4, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 4, 'num_attention_heads': 2},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    # {'gpus': 1, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    # {'gpus': 4, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    # {'gpus': 4, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 2},
 ]
 
 
@@ -94,7 +94,7 @@ def prepare_configs():
     print(f"working directory prefix: {prefix}")
     for conf in train_configs:
         seq_len = 256
-        while seq_len <= (65536 * 4):
+        while seq_len <= (65536 * 2):
             conf['sequence_length'] = seq_len
             generated_uuid = str(uuid.uuid4())
             config_path = f"{prefix}/{generated_uuid}"
