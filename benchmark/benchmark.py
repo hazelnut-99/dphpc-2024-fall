@@ -5,6 +5,7 @@ from datetime import datetime
 import json
 import time
 import shutil
+import uuid
 
 resource_conf = {
     "time": "04:00:00",
@@ -80,50 +81,41 @@ def execute_shell_command(cmd):
     return p.returncode
 
 
-def run_one_config(conf, config_path):
-    # create a directory using conf_id
+def prepare_one_config(conf, config_path):
     time.sleep(5)
     print("Training using config: " + ", ".join(f"{key}={value}" for key, value in conf.items()))
     top_directory = f"output/{config_path}"
     create_directory(top_directory)
+
     # generate the yaml file
     with open(f'{top_directory}/conf.yaml', 'w') as file:
         yaml.dump(render_yaml_content(conf), file)
 
-    resource_conf['output'] = f"{top_directory}/job_%j.o"
-    resource_conf['error'] = f"{top_directory}/job_%j.e"
-    resource_conf['gpus-per-task'] = conf['gpus']
-    srun_conf = " ".join([f"--{key}={value}" for key, value in resource_conf.items()])
-    # submit job
-    command = f"srun {srun_conf} bash submit.sh {conf['gpus']} {top_directory}"
-    rc = execute_shell_command(command)
+    with open(f'{top_directory}/gpus', 'w') as file:
+        file.write(str(conf['gpus']))
 
-    # collect result dump to file
-    outcome = dict(conf)
-    outcome['result'] = 'success' if rc == 0 else 'fail'
-
-    with open(f'{top_directory}/outcome.json', 'w') as json_file:
-        json.dump(outcome, json_file, indent=4)
-    return rc == 0
+    with open(f'{top_directory}/parameters.json', 'w') as json_file:
+        json.dump(conf, json_file, indent=4)
 
 
-def run():
+def prepare_configs():
     prefix = datetime.now().strftime("%Y%m%d%H%M%S")
     print(f"working directory prefix: {prefix}")
-    index = 0
     for conf in train_configs:
         seq_len = 256
-        while True:
-            conf['sequence_length'] = seq_len
-            config_path = f"{prefix}/{index}"
-            success = run_one_config(conf, config_path)
+        while seq_len <= 65536:
+            generated_uuid = str(uuid.uuid4())
+            config_path = f"{prefix}/{generated_uuid}"
+            prepare_one_config(conf, config_path)
             seq_len <<= 2
-            index += 1
-            if not success or seq_len > 16384:
-                break
+    return prefix
 
 
-run()
+prefix = prepare_configs()
+command = f"sbatch run.sh ./output/{prefix}"
+execute_shell_command(command)
+
+
 
 
 
