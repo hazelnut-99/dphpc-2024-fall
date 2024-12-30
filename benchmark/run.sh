@@ -56,7 +56,7 @@ for subdir in "$TOP_DIR"/*; do
         fi
 
         # Run the nsys profile command
-        $NSYS_PATH profile --trace=nvtx,cuda \
+        srun $NSYS_PATH profile --trace=nvtx,cuda \
           --cuda-memory-usage=false --cuda-um-cpu-page-faults=false --cuda-um-gpu-page-faults=false -s none \
           --output="${subdir}/nanotron_nsys_report_%h_%p" \
           CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=$GPUS ../src/nanotron-sp/run_train.py \
