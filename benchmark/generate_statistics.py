@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import argparse
+from get_comm_vol import get_communication_volume
 
 
 def load_sqlite(db_path):
@@ -61,6 +62,22 @@ def extract_statistics(db_path):
                 'measurement': event['train_step']['hardware_tflops']
             }
             stats_summary.append(record)
+
+    comm_details, total_send, total_recv = get_communication_volume(os.path.dirname(db_path))
+    stats_summary.extend([
+        {
+            'metric_name': 'comm_details',
+            'measurement': json.dumps(comm_details)
+        },
+        {
+            'metric_name': 'total_send_bytes',
+            'measurement': total_send
+        },
+        {
+            'metric_name': 'total_recv_bytes',
+            'measurement': total_recv
+        }
+    ])
 
     return stats_summary
 
