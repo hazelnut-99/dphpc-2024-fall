@@ -84,6 +84,7 @@ def run(top_dir):
                     json_path = file_name
                 elif file_name.endswith("return_code"):
                     result_path = result_path
+            # todo read stderr
             pairs.append((sqlite_path, json_path, result_path))
 
     results = []

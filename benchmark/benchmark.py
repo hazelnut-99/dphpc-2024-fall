@@ -104,6 +104,7 @@ def prepare_configs():
     for conf in train_configs:
         seq_len = 256
         while seq_len <= 65536:
+            conf['sequence_length'] = seq_len
             generated_uuid = str(uuid.uuid4())
             config_path = f"{prefix}/{generated_uuid}"
             prepare_one_config(conf, config_path)
