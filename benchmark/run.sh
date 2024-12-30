@@ -1,14 +1,14 @@
 #!/bin/bash
 
 #
-#SBATCH --job-name="nanotron_example"
+#SBATCH --job-name="usp_benchmark"
 #SBATCH --time=04:00:00
 #SBATCH --nodelist=ault[25]
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-task=4
 #SBATCH --mem=200G
-#SBATCH --output=nanotron_.%j.o
-#SBATCH --error=nanotron_.%j.e
+#SBATCH --output=usp_benchmark_%j.o
+#SBATCH --error=usp_benchmark_%j.e
 #SBATCH --account=g34
 
 
@@ -19,16 +19,21 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+echo "hello world"
+
 # Set up environment
 shopt -s expand_aliases
 source ~/.bashrc
 env_init
 rm -rf checkpoints
 export HUGGINGFACE_TOKEN=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
+export CUDA_DEVICE_MAX_CONNECTIONS=1
 
 cd ../src/nanotron-sp
 pip install -e . > /dev/null 2>&1
 cd - > /dev/null 2>&1
+
+which torchrun
 
 TOP_DIR=$1
 
@@ -59,7 +64,7 @@ for subdir in "$TOP_DIR"/*; do
         srun $NSYS_PATH profile --trace=nvtx,cuda \
           --cuda-memory-usage=false --cuda-um-cpu-page-faults=false --cuda-um-gpu-page-faults=false -s none \
           --output="${subdir}/nanotron_nsys_report_%h_%p" \
-          CUDA_DEVICE_MAX_CONNECTIONS=1 torchrun --nproc_per_node=$GPUS ../src/nanotron-sp/run_train.py \
+          torchrun --nproc_per_node=$GPUS ../src/nanotron-sp/run_train.py \
           --config-file "$subdir/conf.yaml" > "$subdir/stdout.o" 2> "$subdir/stderr.e"
 
         # Capture the return code and log it

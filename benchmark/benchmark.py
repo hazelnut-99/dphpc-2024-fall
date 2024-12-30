@@ -3,17 +3,8 @@ import subprocess
 import os
 from datetime import datetime
 import json
-import time
 import shutil
 import uuid
-
-resource_conf = {
-    "time": "04:00:00",
-    "nodelist": "ault[25]",
-    "ntasks-per-node": 1,
-    "mem": "200G",
-    "account": "g34"
-}
 
 
 train_configs = [
@@ -62,6 +53,7 @@ def render_yaml_content(conf):
     data['parallelism']['sp_ulysses'] = conf['sp_ulysses']
     data['model']['model_config']['num_attention_heads'] = conf['num_attention_heads']
     data['tokens']['sequence_length'] = conf['sequence_length']
+    data['model']['model_config']['max_position_embeddings'] = conf['sequence_length']
 
     return data
 
@@ -102,12 +94,12 @@ def prepare_configs():
     print(f"working directory prefix: {prefix}")
     for conf in train_configs:
         seq_len = 256
-        while seq_len <= 65536:
+        while seq_len <= (65536 * 4):
             conf['sequence_length'] = seq_len
             generated_uuid = str(uuid.uuid4())
             config_path = f"{prefix}/{generated_uuid}"
             prepare_one_config(conf, config_path)
-            seq_len <<= 2
+            seq_len <<= 1
     return prefix
 
 

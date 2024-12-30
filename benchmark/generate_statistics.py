@@ -3,6 +3,7 @@ import pandas as pd
 import json
 import os
 import sys
+import argparse
 
 
 def load_sqlite(db_path):
@@ -64,6 +65,12 @@ def extract_statistics(db_path):
     return stats_summary
 
 
+def check_out_of_memory_error(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+        return "OutOfMemoryError" in content
+
+
 def run(top_dir):
     if not os.path.isdir(top_dir):
         print(f"Error: The directory {top_dir} does not exist or is not a valid directory.")
@@ -75,21 +82,25 @@ def run(top_dir):
 
         # Check if it's a directory
         if os.path.isdir(subdir_path):
-            # Find .sqlite and .json files in the subdirectory
-            sqlite_path, json_path, result_path = None, None, None
+            sqlite_path, json_path, result_path, c, stderr_path = None, None, None, None, None
             for file_name in os.listdir(subdir_path):
+                full_path = os.path.join(subdir_path, file_name)
                 if file_name.endswith(".sqlite"):
-                    sqlite_path = file_name
+                    sqlite_path = full_path
                 elif file_name.endswith(".json"):
-                    json_path = file_name
+                    json_path = full_path
                 elif file_name.endswith("return_code"):
-                    result_path = result_path
-            # todo read stderr
-            pairs.append((sqlite_path, json_path, result_path))
+                    result_path = full_path
+                elif file_name.endswith('stdout.o'):
+                    stdout_path = full_path
+                elif file_name.endswith('stderr.e'):
+                    stderr_path = full_path
+
+            pairs.append((sqlite_path, json_path, result_path, stdout_path, stderr_path))
 
     results = []
     stats = []
-    for db_path, conf_path, rc_path in pairs:
+    for db_path, conf_path, rc_path, stdout_path, stderr_path in pairs:
         with open(conf_path, 'r') as file:
             conf = json.load(file)
         with open(rc_path, 'r') as file:
@@ -97,10 +108,14 @@ def run(top_dir):
             number = int(content)
             result_item = dict(conf)
             result_item['success'] = number == 0
-        stat_item = extract_statistics(db_path)
-        stat_item.update(conf)
+            if not result_item['success']:
+                result_item['error_msg'] = 'OOM' if check_out_of_memory_error(stderr_path) else None
+
+        stat_items = extract_statistics(db_path)
+        for stat_item in stat_items:
+            stat_item.update(conf)
         results.append(result_item)
-        stats.append(stat_item)
+        stats.extend(stat_items)
 
     result_df = pd.DataFrame(results)
     stat_df = pd.DataFrame(stats)
@@ -108,4 +123,13 @@ def run(top_dir):
     result_df.to_csv(f"{top_dir}/result.csv", index=False)
     stat_df.to_csv(f"{top_dir}/stat.csv", index=False)
 
-run()
+
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    'top_dir',
+    type=str,
+    help="top_dir"
+)
+args = parser.parse_args()
+top_dir = args.top_dir
+run(top_dir)
