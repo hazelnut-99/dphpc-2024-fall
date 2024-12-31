@@ -345,7 +345,7 @@ def get_nsys_events(dir_path):
                                     "ts_end": ts_end,
                                     "seq": events_counter[goal_rank][gpuId][commId]["AllGather"]
                                 }
-                        )    
+                            )    
                             
                             events_counter[goal_rank][gpuId][commId]["AllGather"] += 1
 
@@ -662,6 +662,19 @@ def get_nsys_events(dir_path):
 
                         elif last_update[gpuId] == "P2P":
                             nccl_events[goal_rank][gpuId][last_P2P_streamId[gpuId]][-1]["ts_kernel"] = ts_kernel
+
+            nccl_real_events = {}
+            for goal_rank ,nccl_goal_events in nccl_events.items():
+                nccl_real_events[goal_rank] = {}
+                for gpuId, nccl_gpu_events in nccl_goal_events.items():
+                    nccl_real_events[goal_rank][gpuId] = {}
+                    for streamId, nccl_stream_events in nccl_gpu_events.items():
+                        nccl_real_events[goal_rank][gpuId][streamId] = []
+                        for event in nccl_stream_events:
+                            if "elems" in event or "P2P_elems" in event:
+                                nccl_real_events[goal_rank][gpuId][streamId].append(event)
+
+            nccl_events = nccl_real_events
             
             cursor.execute("SELECT globalPid, pid FROM PROCESSES")
             globalPid_pids = cursor.fetchall()
@@ -974,9 +987,9 @@ def get_in_gpu_microevents_dependency(nccl_group_events, comm_init_events, comm_
                                             SendRecvEvents_To_TaskCounter[goal_rank][gpuId][commId][event["event_type"]][event["seq"]][channel_id]["send"] = {}
                                             SendRecvEvents_To_TaskCounter[goal_rank][gpuId][commId][event["event_type"]][event["seq"]][channel_id]["recv"] = {}
                                             nranks = comm_info[event["commId"]]["nranks"]  ## 2
-                                            prevIx = channel_info[channel_id]["previous_rank"]  ## local rank index in the communicator
+                                            prevIx = channel_info[0]["previous_rank"]  ## local rank index in the communicator
                                             SendRecvEvents_To_TaskCounter[goal_rank][gpuId][commId][event["event_type"]][event["seq"]][channel_id]["recv"][prevIx] = []
-                                            nextIx = channel_info[channel_id]["next_rank"]  ## local rank index in the communicator
+                                            nextIx = channel_info[0]["next_rank"]  ## local rank index in the communicator
                                             SendRecvEvents_To_TaskCounter[goal_rank][gpuId][commId][event["event_type"]][event["seq"]][channel_id]["send"][nextIx] = []
                                             
                                             chunkCount = elem["chunkCount"]
@@ -1879,8 +1892,23 @@ def main():
     # Get nsys events
     Dir_Path = './results/nsys_reports'
     Comm_Init_Events, NCCL_Events, CUPTI_Kernel_Results, Comm_Info, HostName_To_GoalRank = get_nsys_events(Dir_Path)  ## nccl_events, cupti_kernel_results, comm_info, HostName_To_GoalRank
+    with open("./results/nsys_events_intermediate_output.json", "w") as json_file:
+        json.dump(HostName_To_GoalRank, json_file, indent=4)
+        json_file.write('\n\n')
+        json.dump(Comm_Info, json_file, indent=4)
+        json_file.write('\n\n')
+        json.dump(CUPTI_Kernel_Results, json_file, indent=4)
+        json_file.write('\n\n')
+        json.dump(NCCL_Events, json_file, indent=4)
+        json_file.write('\n\n')
+        json.dump(Comm_Init_Events, json_file, indent=4)
+    print("Nsys_Events has been exported to nsys_events_intermediate_output.json")
 
     Merged_Events = merge_nsys_events(NCCL_Events, CUPTI_Kernel_Results, Comm_Info)
+    with open("./results/nsys_events_merged_output.json", "w") as json_file:
+        json.dump(Merged_Events, json_file, indent=4)
+        json_file.write('\n\n')
+    print("Merged_Events has been exported to nsys_events_merged_output.json")
 
     Events_Parallel_Group = get_events_parallel_group(Merged_Events)
 
