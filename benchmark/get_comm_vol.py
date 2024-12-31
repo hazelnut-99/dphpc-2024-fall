@@ -486,9 +486,9 @@ def get_nsys_events(dir_path):
                                         ],
                                         "P2P_elems": []
                                     }
-                            )
+                                )
 
-                            P2P_state[gpuId] = 2
+                                P2P_state[gpuId] = 2
 
                         elif P2P_state[gpuId] == 2:
                             comm = match_nccl_Send.group(1)
@@ -518,7 +518,8 @@ def get_nsys_events(dir_path):
 
                             P2P_state[gpuId] = 2
 
-                        events_counter[goal_rank][gpuId][commId]["Send"][peer_rank] += 1
+                        if comm_info[commId]["nranks"] > 1:
+                            events_counter[goal_rank][gpuId][commId]["Send"][peer_rank] += 1
 
                         last_P2P_streamId[gpuId] = streamId
                         last_update[gpuId] = "P2P"
@@ -577,9 +578,9 @@ def get_nsys_events(dir_path):
                                         ],
                                         "P2P_elems": []
                                     }
-                            )
+                                )
 
-                            P2P_state[gpuId] = 2
+                                P2P_state[gpuId] = 2
 
                         elif P2P_state[gpuId] == 2:
                             comm = match_nccl_Recv.group(1)
@@ -609,7 +610,8 @@ def get_nsys_events(dir_path):
 
                             P2P_state[gpuId] = 2
 
-                        events_counter[goal_rank][gpuId][commId]["Recv"][peer_rank] +=1
+                        if comm_info[commId]["nranks"] > 1:
+                            events_counter[goal_rank][gpuId][commId]["Recv"][peer_rank] +=1
 
                         last_P2P_streamId[gpuId] = streamId
                         last_update[gpuId] = "P2P"
