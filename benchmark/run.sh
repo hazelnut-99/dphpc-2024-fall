@@ -28,6 +28,7 @@ env_init
 rm -rf checkpoints
 export HUGGINGFACE_TOKEN=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
 export CUDA_DEVICE_MAX_CONNECTIONS=1
+export LD_PRELOAD=/users/zhu/nccl_nvtx_npkit_v2.20.5-1/nccl/build/lib/libnccl.so
 
 cd ../src/nanotron-sp
 pip install -e . > /dev/null 2>&1
