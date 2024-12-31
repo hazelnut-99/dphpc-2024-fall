@@ -94,7 +94,7 @@ def prepare_configs():
     print(f"working directory prefix: {prefix}")
     for conf in train_configs:
         seq_len = 256
-        while seq_len <= (65536 * 2):
+        while seq_len <= (65536 * 16):
             conf['sequence_length'] = seq_len
             generated_uuid = str(uuid.uuid4())
             config_path = f"{prefix}/{generated_uuid}"
