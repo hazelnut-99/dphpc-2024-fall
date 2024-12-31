@@ -63,8 +63,18 @@ def extract_statistics(db_path):
             }
             stats_summary.append(record)
 
-    comm_details, total_send, total_recv = get_communication_volume(os.path.dirname(db_path))
-    stats_summary.extend([
+    return stats_summary
+
+
+def check_out_of_memory_error(file_path):
+    with open(file_path, 'r') as file:
+        content = file.read()
+        return "OutOfMemoryError" in content
+
+
+def extract_communication_details(dir_path):
+    comm_details, total_send, total_recv = get_communication_volume(dir_path)
+    return [
         {
             'metric_name': 'comm_details',
             'measurement': json.dumps(comm_details)
@@ -77,15 +87,8 @@ def extract_statistics(db_path):
             'metric_name': 'total_recv_bytes',
             'measurement': total_recv
         }
-    ])
+    ]
 
-    return stats_summary
-
-
-def check_out_of_memory_error(file_path):
-    with open(file_path, 'r') as file:
-        content = file.read()
-        return "OutOfMemoryError" in content
 
 
 def run(top_dir):
@@ -126,13 +129,18 @@ def run(top_dir):
             result_item = dict(conf)
             result_item['success'] = number == 0
             if not result_item['success']:
-                result_item['error_msg'] = 'OOM' if check_out_of_memory_error(stderr_path) else None
+                result_item['error_msg'] = 'OOM' if check_out_of_memory_error(stderr_path) else 'Unknown'
 
-        stat_items = extract_statistics(db_path)
-        for stat_item in stat_items:
-            stat_item.update(conf)
         results.append(result_item)
-        stats.extend(stat_items)
+        # if success, get details
+        if result_item['success']:
+            stat_items = extract_statistics(db_path)
+            communication_items = extract_communication_details(os.path.dirname(db_path))
+            stat_items.extend(communication_items)
+            for stat_item in stat_items:
+                stat_item.update(conf)
+
+            stats.extend(stat_items)
 
     result_df = pd.DataFrame(results)
     stat_df = pd.DataFrame(stats)

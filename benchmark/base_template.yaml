@@ -52,7 +52,7 @@ model:
     bos_token_id: 1
     eos_token_id: 2
     hidden_act: silu
-    hidden_size: 1024
+    hidden_size: 512
     initializer_range: 0.02
     intermediate_size: 64
     is_llama_config: true
