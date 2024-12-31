@@ -2,8 +2,8 @@
 #
 #SBATCH --job-name="nanotron_example"
 #SBATCH --time=04:00:00
-#SBATCH --partition=amda100
-#SBATCH --nodelist=ault[25]
+#SBATCH --partition=amdrtx
+#SBATCH --nodelist=ault[41-42]
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-task=2
 #SBATCH --mem=200G
@@ -11,7 +11,7 @@
 #SBATCH --error=nanotron_example.%j.e
 #SBATCH --account=g34
 
-conda activate nanotron_env
+conda activate nanotron-sp
 
 module load openmpi/4.1.1
 module load cuda/12.1.1
@@ -19,23 +19,17 @@ module load rdma-core/34.0
 
 srun nvidia-smi -L
 
-export NCCL_DEBUG=INFO ## For debug
-export NCCL_TOPO_DUMP_FILE="./results/Topology_Intra_Node.txt" ## NCCL_PARAM(TopoDumpFileRank, "TOPO_DUMP_FILE_RANK", 0);
-export NCCL_GRAPH_DUMP_FILE="./results/Graph.txt" ## NCCL_PARAM(GraphDumpFileRank, "GRAPH_DUMP_FILE_RANK", 0);
-
 rm -rf "./results"
 mkdir -p "./results"
 
 export NSYS_REPORT_DIR="./results/nsys_reports"
-# export NSYS_REPORT_DIR="./results/nsys_reports"
 rm -rf $NSYS_REPORT_DIR
 mkdir -p $NSYS_REPORT_DIR
 
 export CUDA_DEVICE_MAX_CONNECTIONS=1 # Important for Nanotron
 export OMP_NUM_THREADS=16  ## Unused
 
-# EDIT if it's not 2-gpus per node
-GPUS_PER_NODE=2
+GPUS_PER_NODE=2  # EDIT if it's not 2-gpus per node
 NNODES=$SLURM_NNODES
 
 # define the node 0 hostname:port
@@ -54,21 +48,21 @@ LAUNCHER="python -u -m torch.distributed.run \
     --role $(hostname -s|tr -dc '0-9'): "
 
 # Check that relative paths to your `run_train.py` are correct
-PROGRAM="--master_port $MASTER_PORT ../src/nanotron-vanilla/run_train.py --config-file config_tiny_llama_eval_vanilla.yaml "
+PROGRAM="--master_port $MASTER_PORT ../src/nanotron-sp/run_train.py --config-file sp_ulysys_conf_v3.yaml "
 
 export CMD="${LAUNCHER} ${PROGRAM}"
 
 echo $CMD
 
 # bash -c is needed for the delayed interpolation of env vars to work
-srun bash -c "$CMD"
-# srun ~/opt/nvidia/nsight-systems-cli/2024.5.1/bin/nsys profile --trace=nvtx,cuda  --cuda-memory-usage=false --cuda-um-cpu-page-faults=false --cuda-um-gpu-page-faults=false -s none --output=${NSYS_REPORT_DIR}/nanotron_llama_train_nsys_report_%h_%p bash -c "$CMD"
+# srun bash -c "$CMD"
+srun ~/opt/nvidia/nsight-systems-cli/2024.5.1/bin/nsys profile --trace=nvtx,cuda  --cuda-memory-usage=false --cuda-um-cpu-page-faults=false --cuda-um-gpu-page-faults=false -s none --output=${NSYS_REPORT_DIR}/nanotron_llama_train_nsys_report_%h_%p bash -c "$CMD"
 
-# for report_file in ${NSYS_REPORT_DIR}/*.nsys-rep; do
-#   if [ -f "$report_file" ]; then
-#     sqlite_file="${report_file%.nsys-rep}.sqlite"
-#     # srun ~/opt/nvidia/nsight-systems-cli/2024.5.1/bin/nsys export --sqlite "$sqlite_file" "$report_file"
-#     ~/opt/nvidia/nsight-systems-cli/2024.5.1/bin/nsys export --type=sqlite --ts-normalize=true --output="$sqlite_file" "$report_file"
-#     echo "Exported $report_file to $sqlite_file"
-#   fi
-# done
+for report_file in ${NSYS_REPORT_DIR}/*.nsys-rep; do
+  if [ -f "$report_file" ]; then
+    sqlite_file="${report_file%.nsys-rep}.sqlite"
+    # srun ~/opt/nvidia/nsight-systems-cli/2024.5.1/bin/nsys export --sqlite "$sqlite_file" "$report_file"
+    ~/opt/nvidia/nsight-systems-cli/2024.5.1/bin/nsys export --type=sqlite --ts-normalize=true --output="$sqlite_file" "$report_file"
+    echo "Exported $report_file to $sqlite_file"
+  fi
+done
