@@ -26,6 +26,8 @@ export NSYS_REPORT_DIR="./results/nsys_reports"
 rm -rf $NSYS_REPORT_DIR
 mkdir -p $NSYS_REPORT_DIR
 
+export LD_PRELOAD=/users/zhu/nccl_nvtx_npkit_v2.20.5-1/nccl/build/lib/libnccl.so
+
 export CUDA_DEVICE_MAX_CONNECTIONS=1 # Important for Nanotron
 export OMP_NUM_THREADS=16  ## Unused
 
