@@ -15,7 +15,6 @@ conda activate nanotron-sp
 
 module load openmpi/4.1.1
 module load cuda/12.1.1
-module load rdma-core/34.0
 
 srun nvidia-smi -L
 
@@ -23,6 +22,8 @@ srun nvidia-smi -L
 export LD_PRELOAD=/users/zhu/nccl_nvtx_npkit_v2.20.5-1/nccl/build/lib/libnccl.so
 export CUDA_DEVICE_MAX_CONNECTIONS=1
 export HUGGINGFACE_TOKEN=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
+export NCCL_DEBUG=INFO
+export NCCL_IB_DISABLE=1
 
 TOP_DIR=$1
 echo "Processing top directory: $TOP_DIR"
