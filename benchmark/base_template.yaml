@@ -96,6 +96,7 @@ parallelism:
   tp_mode: REDUCE_SCATTER
   sp_ring: 1
   sp_ulysses: 1
+  ring_across_node: true
 profiler: null
 tokenizer:
   tokenizer_max_length: null

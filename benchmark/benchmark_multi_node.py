@@ -23,9 +23,11 @@ train_configs = [
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 4,
      'num_attention_heads': 4},
 
-    # todo different sp degree distributions
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 2, 'sp_ulysses': 2,
      'num_attention_heads': 4},
+
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 2, 'sp_ulysses': 2,
+     'num_attention_heads': 4, 'ring_across_node': False},
 
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 1,
      'num_attention_heads': 2},
@@ -36,13 +38,17 @@ train_configs = [
 
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 4, 'sp_ulysses': 1,
      'num_attention_heads': 2},
-    # can only use two gpus
-    {'gpus_avail': 4, 'per_node_gpus': 1, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 2,
-     'num_attention_heads': 2},
 
-    # todo different sp degree distributions
+    # todo can only use two gpus
+    # {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 2,
+    #  'num_attention_heads': 2},
+
+
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 2, 'sp_ulysses': 2,
      'num_attention_heads': 2},
+
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 2, 'sp_ulysses': 2,
+     'num_attention_heads': 2, 'ring_across_node': False},
 
 ]
 
@@ -57,11 +63,15 @@ def render_yaml_content(conf):
     data['parallelism']['sp_ring'] = conf['sp_ring']
     data['parallelism']['sp_ulysses'] = conf['sp_ulysses']
 
+    if 'ring_across_node' in conf:
+        data['parallelism']['ring_across_node'] = conf['ring_across_node']
+
     data['model']['model_config']['num_attention_heads'] = conf['num_attention_heads']
     data['model']['model_config']['num_key_value_heads'] = conf['num_attention_heads']
 
     data['tokens']['sequence_length'] = conf['sequence_length']
     data['model']['model_config']['max_position_embeddings'] = conf['sequence_length']
+
 
     return data
 
