@@ -168,3 +168,4 @@ checkpoints/
 wandb/
 
 log_*.txt
+log/
