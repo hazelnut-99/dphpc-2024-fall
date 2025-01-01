@@ -1,6 +1,6 @@
-                                         #!/bin/bash -l
+#!/bin/bash -l
 #
-#SBATCH --job-name="nanotron_example"
+#SBATCH --job-name="usp_multi_benchmark"
 #SBATCH --time=04:00:00
 #SBATCH --partition=amdrtx
 #SBATCH --nodelist=ault[43-44]
@@ -11,6 +11,7 @@
 #SBATCH --error=nanotron_example.%j.e
 #SBATCH --account=g34
 
+conda activate base
 conda activate nanotron-sp
 
 module load openmpi/4.1.1
