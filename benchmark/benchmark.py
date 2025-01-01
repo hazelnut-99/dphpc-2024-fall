@@ -37,7 +37,6 @@ train_configs = [
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 2, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 2},
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
 
-
 ]
 
 
