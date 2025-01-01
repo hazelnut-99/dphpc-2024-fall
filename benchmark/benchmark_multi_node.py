@@ -6,25 +6,43 @@ import json
 import shutil
 import uuid
 
-
 train_configs = [
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 4, 'num_attention_heads': 4},
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 2, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 4},
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 4},
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 1,
+     'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 4, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 1,
+     'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 1, 'node_cnt': 2, 'dp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 4, 'sp_ring': 1, 'sp_ulysses': 1,
+     'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 4, 'sp_ulysses': 1,
+     'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 2, 'sp_ring': 2, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 2, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 4,
+     'num_attention_heads': 4},
+
+    # todo different sp degree distributions
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 2, 'sp_ulysses': 2,
+     'num_attention_heads': 4},
+
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 1,
+     'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 4, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 1,
+     'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 4, 'sp_ring': 1, 'sp_ulysses': 1,
+     'num_attention_heads': 2},
+
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 4, 'sp_ulysses': 1,
+     'num_attention_heads': 2},
+    # can only use two gpus
+    {'gpus_avail': 4, 'per_node_gpus': 1, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 2,
+     'num_attention_heads': 2},
+
+    # todo different sp degree distributions
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 2, 'sp_ulysses': 2,
+     'num_attention_heads': 2},
 
 ]
 
@@ -34,6 +52,8 @@ def render_yaml_content(conf):
         data = yaml.safe_load(file)
 
     data['parallelism']['dp'] = conf['dp']
+    data['parallelism']['tp'] = conf['tp']
+    data['parallelism']['pp'] = conf['pp']
     data['parallelism']['sp_ring'] = conf['sp_ring']
     data['parallelism']['sp_ulysses'] = conf['sp_ulysses']
 
@@ -81,7 +101,7 @@ def prepare_configs():
     prefix = datetime.now().strftime("%Y%m%d%H%M%S")
     print(f"working directory prefix: {prefix}")
     for conf in train_configs:
-        seq_len = 256
+        seq_len = 4096
         while seq_len <= (65536 * 2):
             conf['sequence_length'] = seq_len
             generated_uuid = str(uuid.uuid4())
