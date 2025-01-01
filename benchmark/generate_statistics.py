@@ -146,8 +146,9 @@ def run(top_dir):
         # if success, get details
         if result_item['success']:
             stat_items = extract_statistics(db_paths)
-            communication_items = extract_communication_details(os.path.dirname(db_paths[0]))
-            stat_items.extend(communication_items)
+            if 'dp' not in conf and 'tp' not in conf and 'pp' not in conf:
+                communication_items = extract_communication_details(os.path.dirname(db_paths[0]))
+                stat_items.extend(communication_items)
             for stat_item in stat_items:
                 stat_item.update(conf)
 

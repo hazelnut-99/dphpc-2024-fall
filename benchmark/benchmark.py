@@ -9,30 +9,26 @@ import uuid
 
 train_configs = [
 
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 1, 'tp': 4, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 1,
-     'num_attention_heads': 4},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'tp': 4, 'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 4, 'sp_ring': 1, 'sp_ulysses': 1,
-     'num_attention_heads': 4},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'pp': 4,  'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 4},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 4, 'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 4, 'num_attention_heads': 4},
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 4},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ulysses': 4, 'num_attention_heads': 4},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 4},
 
 
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 1, 'num_attention_heads': 2},
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 1, 'tp': 4, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 1,
-     'num_attention_heads': 2},
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 4, 'sp_ring': 1, 'sp_ulysses': 1,
-     'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'tp': 4, 'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'pp': 4,  'num_attention_heads': 2},
 
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 4, 'sp_ulysses': 1, 'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 4, 'num_attention_heads': 2},
     # can only use two gpus
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 2},
 
 ]
 
@@ -41,11 +37,18 @@ def render_yaml_content(conf):
     with open('base_template.yaml', 'r') as file:
         data = yaml.safe_load(file)
 
-    data['parallelism']['dp'] = conf['dp']
-    data['parallelism']['tp'] = conf['tp']
-    data['parallelism']['pp'] = conf['pp']
-    data['parallelism']['sp_ring'] = conf['sp_ring']
-    data['parallelism']['sp_ulysses'] = conf['sp_ulysses']
+    if 'dp' in conf:
+        data['parallelism']['dp'] = conf['dp']
+    if 'tp' in conf:
+        data['parallelism']['tp'] = conf['tp']
+    if 'pp' in conf:
+        data['parallelism']['pp'] = conf['pp']
+    if 'sp_ring' in conf:
+        data['parallelism']['sp_ring'] = conf['sp_ring']
+    if 'sp_ulysses' in conf:
+        data['parallelism']['sp_ulysses'] = conf['sp_ulysses']
+    if 'ring_across_node' in conf:
+        data['parallelism']['ring_across_node'] = conf['ring_across_node']
 
     data['model']['model_config']['num_attention_heads'] = conf['num_attention_heads']
     data['model']['model_config']['num_key_value_heads'] = conf['num_attention_heads']
@@ -96,7 +99,8 @@ def prepare_configs():
             conf['sequence_length'] = seq_len
             generated_uuid = str(uuid.uuid4())
             config_path = f"{prefix}/{generated_uuid}"
-            prepare_one_config(conf, config_path)
+            for _ in range(3):
+                prepare_one_config(conf, config_path)
             seq_len <<= 1
     return prefix
 

@@ -10,10 +10,6 @@ train_configs = [
 
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'num_attention_heads': 4},
 
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'tp': 4, 'num_attention_heads': 4},
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'pp': 4, 'num_attention_heads': 4},
-
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 4, 'num_attention_heads': 4},
 
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ulysses': 4, 'num_attention_heads': 4},
@@ -23,16 +19,14 @@ train_configs = [
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 2, 'sp_ulysses': 2,
      'num_attention_heads': 4, 'ring_across_node': False},
 
+
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'num_attention_heads': 2},
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'tp': 4, 'num_attention_heads': 2},
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'pp': 4,  'num_attention_heads': 2},
 
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 4, 'num_attention_heads': 2},
 
     # todo can only use two gpus
     # {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 2,
     #  'num_attention_heads': 2},
-
 
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 2, 'sp_ulysses': 2,
      'num_attention_heads': 2},
@@ -109,7 +103,9 @@ def prepare_configs():
             conf['sequence_length'] = seq_len
             generated_uuid = str(uuid.uuid4())
             config_path = f"{prefix}/{generated_uuid}"
-            prepare_one_config(conf, config_path)
+            # repeat three times
+            for _ in range(3):
+                prepare_one_config(conf, config_path)
             seq_len <<= 1
     return prefix
 
