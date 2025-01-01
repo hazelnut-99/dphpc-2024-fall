@@ -15,7 +15,7 @@ conda activate nanotron-sp
 
 module load openmpi/4.1.1
 module load cuda/12.1.1
-module load rdma-core/34.0
+# module load rdma-core/34.0
 
 srun nvidia-smi -L
 
@@ -27,6 +27,8 @@ rm -rf $NSYS_REPORT_DIR
 mkdir -p $NSYS_REPORT_DIR
 
 export LD_PRELOAD=/users/zhu/nccl_nvtx_npkit_v2.20.5-1/nccl/build/lib/libnccl.so
+export NCCL_DEBUG=INFO
+export NCCL_IB_DISABLE=1
 
 export CUDA_DEVICE_MAX_CONNECTIONS=1 # Important for Nanotron
 export OMP_NUM_THREADS=16  ## Unused
@@ -50,7 +52,7 @@ LAUNCHER="python -u -m torch.distributed.run \
     --role $(hostname -s|tr -dc '0-9'): "
 
 # Check that relative paths to your `run_train.py` are correct
-PROGRAM="--master_port $MASTER_PORT ../src/nanotron-sp/run_train.py --config-file sp_ulysys_conf_v3.yaml "
+PROGRAM="--master_port $MASTER_PORT /users/zhu/dphpc-2024-fall/src/nanotron-sp/run_train.py --config-file sp_ulysys_conf_v4.yaml "
 
 export CMD="${LAUNCHER} ${PROGRAM}"
 
