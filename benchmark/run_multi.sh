@@ -19,6 +19,9 @@ module load cuda/12.1.1
 
 srun nvidia-smi -L
 
+cd ../src/nanotron-sp
+pip install -e . > /dev/null 2>&1
+cd - > /dev/null 2>&1
 
 export LD_PRELOAD=/users/zhu/nccl_nvtx_npkit_v2.20.5-1/nccl/build/lib/libnccl.so
 export CUDA_DEVICE_MAX_CONNECTIONS=1
