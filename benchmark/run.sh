@@ -54,8 +54,8 @@ for subdir in "$TOP_DIR"/*; do
         fi
 
         # Check if gpus file exists and read the number of GPUs
-        if [ -f "$subdir/gpus" ]; then
-            GPUS=$(cat "$subdir/gpus")
+        if [ -f "$subdir/per_node_gpus" ]; then
+            GPUS=$(cat "$subdir/per_node_gpus")
         else
             echo "Warning: No 'gpus' file found in $subdir. Skipping this directory."
             continue
@@ -70,7 +70,7 @@ for subdir in "$TOP_DIR"/*; do
 
         # Capture the return code and log it
         RETURN_CODE=$?
-        echo $RETURN_CODE > "$subdir/return_code"
+        echo $RETURN_CODE >> "$subdir/return_code"
 
     fi
 done
