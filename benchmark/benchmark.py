@@ -14,8 +14,6 @@ train_configs = [
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'num_attention_heads': 4},
     # tp
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'tp': 4, 'num_attention_heads': 4},
-    # pp
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'pp': 4, 'num_attention_heads': 4},
     # sp-ring
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 4, 'num_attention_heads': 4},
     # sp-ulysses
@@ -27,8 +25,6 @@ train_configs = [
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'num_attention_heads': 2},
     # tp
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'tp': 2, 'num_attention_heads': 2},
-    # pp
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'pp': 4, 'num_attention_heads': 2},
     # sp-ring
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 4, 'num_attention_heads': 2},
     # sp-ulysses

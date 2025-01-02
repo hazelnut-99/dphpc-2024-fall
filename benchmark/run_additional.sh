@@ -6,7 +6,7 @@
 #SBATCH --partition=amdrtx
 #SBATCH --nodelist=ault[41]
 #SBATCH --ntasks-per-node=1
-#SBATCH --gpus-per-task=4
+#SBATCH --gpus-per-task=2
 #SBATCH --mem=200G
 #SBATCH --output=usp_benchmark_%j.o
 #SBATCH --error=usp_benchmark_%j.e

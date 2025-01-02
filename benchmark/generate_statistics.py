@@ -101,7 +101,7 @@ def extract_communication_details(dir_path):
         },
         {
             'metric_name': 'comm_per_link',
-            'measurement': comm_details['0']['0']['send']
+            'measurement': comm_details[0][0]['send']
         }
     ]
 
