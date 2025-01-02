@@ -98,6 +98,10 @@ def extract_communication_details(dir_path):
         {
             'metric_name': 'total_recv_bytes',
             'measurement': total_recv
+        },
+        {
+            'metric_name': 'comm_per_link',
+            'measurement': comm_details['0']['0']['send']
         }
     ]
 

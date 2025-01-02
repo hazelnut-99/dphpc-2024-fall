@@ -5,29 +5,35 @@ from datetime import datetime
 import json
 import shutil
 import uuid
+import argparse
 
-
+# for comparing max supported seq length
 train_configs = [
 
+    # dp
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'num_attention_heads': 4},
-
+    # tp
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'tp': 4, 'num_attention_heads': 4},
-
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'pp': 4,  'num_attention_heads': 4},
-
+    # pp
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'pp': 4, 'num_attention_heads': 4},
+    # sp-ring
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 4, 'num_attention_heads': 4},
-
+    # sp-ulysses
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ulysses': 4, 'num_attention_heads': 4},
+    # usp
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 4},
 
-
+    # dp
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'num_attention_heads': 2},
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'tp': 4, 'num_attention_heads': 2},
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'pp': 4,  'num_attention_heads': 2},
-
+    # tp
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'tp': 2, 'num_attention_heads': 2},
+    # pp
+    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'pp': 4, 'num_attention_heads': 2},
+    # sp-ring
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 4, 'num_attention_heads': 2},
-    # can only use two gpus
+    # sp-ulysses
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
+    # usp
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 2},
 
 ]
@@ -90,8 +96,8 @@ def prepare_one_config(conf, config_path):
         json.dump(conf, json_file, indent=4)
 
 
-def prepare_configs():
-    prefix = datetime.now().strftime("%Y%m%d%H%M%S")
+def prepare_configs(job_name):
+    prefix = datetime.now().strftime("%Y%m%d%H%M%S") + '_' + job_name
     print(f"working directory prefix: {prefix}")
     for conf in train_configs:
         seq_len = 4096
@@ -105,7 +111,16 @@ def prepare_configs():
     return prefix
 
 
-prefix = prepare_configs()
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    'job_name',
+    type=str,
+    help="job_name"
+)
+args = parser.parse_args()
+job_name = args.job_name
+
+prefix = prepare_configs(job_name)
 command = f"sbatch run.sh ./output/{prefix}"
 execute_shell_command(command)
 

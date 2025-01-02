@@ -7,33 +7,10 @@ import shutil
 import uuid
 import argparse
 
+# for comparing max supported seq length
 train_configs = [
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'num_attention_heads': 4},
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 4, 'num_attention_heads': 4},
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ulysses': 4, 'num_attention_heads': 4},
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 2, 'sp_ulysses': 2, 'num_attention_heads': 4},
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 2, 'sp_ulysses': 2,
-     'num_attention_heads': 4, 'ring_across_node': False},
-
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'num_attention_heads': 2},
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 4, 'num_attention_heads': 2},
-
-    # todo can only use two gpus
-    # {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 2,
-    #  'num_attention_heads': 2},
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 2, 'sp_ulysses': 2,
-     'num_attention_heads': 2},
-
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 2, 'sp_ulysses': 2,
-     'num_attention_heads': 2, 'ring_across_node': False},
+    # sp-ulysses cannot use all 4 gpus
+    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'sp_ulysses': 2, 'num_attention_heads': 2},
 
 ]
 
@@ -104,7 +81,6 @@ def prepare_configs(job_name):
             conf['sequence_length'] = seq_len
             generated_uuid = str(uuid.uuid4())
             config_path = f"{prefix}/{generated_uuid}"
-            # repeat three times
             for _ in range(3):
                 prepare_one_config(conf, config_path)
             seq_len <<= 1
@@ -121,7 +97,7 @@ args = parser.parse_args()
 job_name = args.job_name
 
 prefix = prepare_configs(job_name)
-command = f"sbatch run_multi.sh ./output/{prefix}"
+command = f"sbatch run_additional.sh ./output/{prefix}"
 execute_shell_command(command)
 
 
