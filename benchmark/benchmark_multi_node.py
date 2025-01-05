@@ -9,7 +9,6 @@ import argparse
 
 train_configs = [
 
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'num_attention_heads': 4},
 
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 4, 'num_attention_heads': 4},
 
@@ -21,13 +20,7 @@ train_configs = [
      'num_attention_heads': 4, 'ring_across_node': False},
 
 
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'dp': 4, 'num_attention_heads': 2},
-
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 4, 'num_attention_heads': 2},
-
-    # todo can only use two gpus
-    # {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'dp': 1, 'tp': 1, 'pp': 1, 'sp_ring': 1, 'sp_ulysses': 2,
-    #  'num_attention_heads': 2},
 
     {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 2, 'sp_ring': 2, 'sp_ulysses': 2,
      'num_attention_heads': 2},
@@ -44,10 +37,6 @@ def render_yaml_content(conf):
 
     if 'dp' in conf:
         data['parallelism']['dp'] = conf['dp']
-    if 'tp' in conf:
-        data['parallelism']['tp'] = conf['tp']
-    if 'pp' in conf:
-        data['parallelism']['pp'] = conf['pp']
     if 'sp_ring' in conf:
         data['parallelism']['sp_ring'] = conf['sp_ring']
     if 'sp_ulysses' in conf:
@@ -102,10 +91,9 @@ def prepare_configs(job_name):
         seq_len = 4096
         while seq_len <= (65536 * 2):
             conf['sequence_length'] = seq_len
-            generated_uuid = str(uuid.uuid4())
-            config_path = f"{prefix}/{generated_uuid}"
-            # repeat three times
-            for _ in range(3):
+            for _ in range(5):
+                generated_uuid = str(uuid.uuid4())
+                config_path = f"{prefix}/{generated_uuid}"
                 prepare_one_config(conf, config_path)
             seq_len <<= 1
     return prefix

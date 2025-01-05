@@ -7,13 +7,12 @@ import shutil
 import uuid
 import argparse
 
-# for comparing max supported seq length
+# single node: max supported seq length, communication volume, training throughput
 train_configs = [
 
     # dp
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'num_attention_heads': 4},
-    # tp
-    {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'tp': 4, 'num_attention_heads': 4},
+
     # sp-ring
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 4, 'num_attention_heads': 4},
     # sp-ulysses
@@ -23,8 +22,7 @@ train_configs = [
 
     # dp
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'dp': 4, 'num_attention_heads': 2},
-    # tp
-    {'gpus_avail': 4, 'per_node_gpus': 2, 'node_cnt': 1, 'tp': 2, 'num_attention_heads': 2},
+
     # sp-ring
     {'gpus_avail': 4, 'per_node_gpus': 4, 'node_cnt': 1, 'sp_ring': 4, 'num_attention_heads': 2},
     # sp-ulysses
@@ -41,10 +39,6 @@ def render_yaml_content(conf):
 
     if 'dp' in conf:
         data['parallelism']['dp'] = conf['dp']
-    if 'tp' in conf:
-        data['parallelism']['tp'] = conf['tp']
-    if 'pp' in conf:
-        data['parallelism']['pp'] = conf['pp']
     if 'sp_ring' in conf:
         data['parallelism']['sp_ring'] = conf['sp_ring']
     if 'sp_ulysses' in conf:
@@ -99,9 +93,9 @@ def prepare_configs(job_name):
         seq_len = 4096
         while seq_len <= (65536 * 2):
             conf['sequence_length'] = seq_len
-            generated_uuid = str(uuid.uuid4())
-            config_path = f"{prefix}/{generated_uuid}"
-            for _ in range(3):
+            for _ in range(5):
+                generated_uuid = str(uuid.uuid4())
+                config_path = f"{prefix}/{generated_uuid}"
                 prepare_one_config(conf, config_path)
             seq_len <<= 1
     return prefix
